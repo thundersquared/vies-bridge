@@ -2,6 +2,8 @@
 FROM devilbox/php-fpm:8.1-prod
 
 LABEL maintainer="Anatoli Nicolae <devops@thundersquared.com>"
+
+# https://github.com/laravel/sail/blob/1da083e30e6b0d646535c0afc2afeffdccb7181d/runtimes/8.1/Dockerfile#L9-L12
 WORKDIR /var/www/default/htdocs
 ENV DEBIAN_FRONTEND noninteractive
 ENV TZ=UTC
@@ -12,5 +14,6 @@ COPY . /var/www/default/htdocs
 
 RUN /usr/local/bin/composer install
 
-# https://laravel.com/docs/9.x/octane#swoole
-ENTRYPOINT /usr/local/bin/php -d variables_order=EGPCS /var/www/default/htdocs/artisan octane:start --server=swoole --host=0.0.0.0 --port=80
+EXPOSE 8000
+
+ENTRYPOINT docker/prod/entrypoint.sh

@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+set -eux
+
+# Create .env if not existent and generate key
+if [ ! -f .env ]
+then
+    cp .env.example .env
+    php artisan key:generate
+fi
