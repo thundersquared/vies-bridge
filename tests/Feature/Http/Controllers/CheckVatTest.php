@@ -1,7 +1,9 @@
 <?php
 
 test('example', function () {
-    $response = $this->get('/');
+    $response = $this->post('/api/vies/check', [
+        'body' =>
+    ]);
 
     $response->assertStatus(200);
 });
