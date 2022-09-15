@@ -6,6 +6,7 @@ use App\Services\ViesService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use Laminas\Diactoros\Response\XmlResponse;
 
 class CheckVat extends Controller
@@ -41,10 +42,20 @@ class CheckVat extends Controller
             // Directly return on missing fields
             if (empty($fields[$field]))
             {
+                $message = sprintf('"%s" field is missing', $field);
+
+                // Track missing fields
+                Log::error($message, [
+                    'request' => $request,
+                    'server' => $request->server,
+                    'ip' => $request->ip(),
+                    'fields' => $fields,
+                ]);
+
                 return $this->respond([
                     'statusCode' => 400,
                     'status' => 'invalid',
-                    'error' => sprintf('"%s" field is missing', $field),
+                    'error' => $message,
                 ]);
             }
         }
@@ -58,6 +69,14 @@ class CheckVat extends Controller
             ]);
         } catch (\Exception $e)
         {
+            // Track failed checks
+            Log::error($e->getMessage(), [
+                'request' => $request,
+                'server' => $request->server,
+                'ip' => $request->ip(),
+                'fields' => $fields,
+            ]);
+
             // Fail on any error
             return $this->respond([
                 'statusCode' => 406,
