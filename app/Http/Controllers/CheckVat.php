@@ -6,6 +6,7 @@ use App\Services\ViesService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Laminas\Diactoros\Response\XmlResponse;
 
@@ -60,12 +61,26 @@ class CheckVat extends Controller
             }
         }
 
+        $key = implode(',', array_values($fields));
+
         try
         {
             // Attempt VAT validation
+            if (Cache::has($key))
+            {
+                $check = json_decode(Cache::get($key), true);
+                $check['cached'] = true;
+            }
+            else
+            {
+                $check = $this->service->validateVat(...$fields);
+                $check['cached'] = false;
+                Cache::put($key, json_encode($check), 60 * 60 * 24 * 7);
+            }
+
             return $this->respond([
                 'statusCode' => 200,
-                ...$this->service->validateVat(...$fields),
+                ...$check,
             ]);
         } catch (\Exception $e)
         {

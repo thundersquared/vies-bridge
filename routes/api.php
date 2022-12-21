@@ -14,5 +14,5 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('vies')->group(function () {
-    Route::match(['get', 'post'], 'check', \App\Http\Controllers\CheckVat::class);
+    Route::match(['get', 'post'], 'check', \App\Http\Controllers\CheckVat::class)->middleware('cacheResponse');
 });
