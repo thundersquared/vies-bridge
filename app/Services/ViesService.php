@@ -25,30 +25,17 @@ class ViesService
         string $requesterCountryCode = '',
         string $requesterVatNumber = ''): array
     {
-        // Check service availability
-        if (false === $this->client->getHeartBeat()->isAlive())
-        {
-            $result = [
-                'status' => 'error',
-                'message' => 'Service is not available at the moment, please try again later.'
-            ];
-        }
-        else
-        {
-            // Attempt VAT validation
-            $check = $this->client->validateVat(
-                $countryCode,
-                $vatNumber,
-                $requesterCountryCode,
-                $requesterVatNumber
-            );
+        // Attempt VAT validation
+        $check = $this->client->validateVat(
+            $countryCode,
+            $vatNumber,
+            $requesterCountryCode,
+            $requesterVatNumber
+        );
 
-            $result = [
-                'status' => $check->isValid() ? 'valid' : 'invalid',
-                'result' => $check->toArray(),
-            ];
-        }
-
-        return $result;
+        return [
+            'status' => $check->isValid() ? 'valid' : 'invalid',
+            'result' => $check->toArray(),
+        ];
     }
 }
